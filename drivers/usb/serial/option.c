@@ -363,6 +363,8 @@ static void option_instat_callback(struct urb *urb);
 
 #define ALINK_VENDOR_ID				0x1e0e
 #define SIMCOM_PRODUCT_SIM7100E			0x9001 /* Yes, ALINK_VENDOR_ID */
+#define SIMCOM_SIM7600_VID 0x1E0E
+#define SIMCOM_SIM7600_PID 0x9001
 #define ALINK_PRODUCT_PH300			0x9100
 #define ALINK_PRODUCT_3GU			0x9200
 
@@ -612,6 +614,11 @@ static void option_instat_callback(struct urb *urb);
 /* Device needs ZLP */
 #define ZLP		BIT(17)
 
+
+// for SIM7600 modem for NDIS
+static const struct option_blacklist_info simcom_sim7600_blacklist={
+	.reserved = BIT(5)
+}
 
 static const struct usb_device_id option_ids[] = {
 	{ USB_DEVICE(OPTION_VENDOR_ID, OPTION_PRODUCT_COLT) },
@@ -1957,6 +1964,10 @@ static const struct usb_device_id option_ids[] = {
 	{ USB_DEVICE_AND_INTERFACE_INFO(ALINK_VENDOR_ID, ALINK_PRODUCT_3GU, 0xff, 0xff, 0xff) },
 	{ USB_DEVICE(ALINK_VENDOR_ID, SIMCOM_PRODUCT_SIM7100E),
 	  .driver_info = RSVD(5) | RSVD(6) },
+	//for SIM7600 modem for NDIS
+	{ USB_DEVICE(SIMCOM_SIM7600_VID, SIMCOM_SIM7600_PID),
+	.driver_info = (kernel_ulong_t)& simcom_sim7600_blacklist
+	},
 	{ USB_DEVICE_INTERFACE_CLASS(0x1e0e, 0x9003, 0xff) },	/* Simcom SIM7500/SIM7600 MBIM mode */
 	{ USB_DEVICE_INTERFACE_CLASS(0x1e0e, 0x9011, 0xff),	/* Simcom SIM7500/SIM7600 RNDIS mode */
 	  .driver_info = RSVD(7) },
@@ -2393,6 +2404,8 @@ static void option_instat_callback(struct urb *urb)
 				__func__, err);
 	}
 }
+
+
 
 MODULE_AUTHOR(DRIVER_AUTHOR);
 MODULE_DESCRIPTION(DRIVER_DESC);
